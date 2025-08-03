@@ -1,0 +1,8 @@
+# 示例：排除R项目常见无用文件
+*.Rhistory
+*.RData
+*.csv
+*.txt  # 若你的脚本自动生成输出文件（如outputs目录中的文件），需根据实际调整
+outputs/  # 若输出文件在项目目录外，可省略
+*.DS_Store  # Mac隐藏文件
+*.bak
