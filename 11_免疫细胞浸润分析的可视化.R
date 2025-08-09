@@ -4,7 +4,8 @@
 #install.packages("corrplot")
 rm(list = ls())  # 清除工作空间
 pacman::p_load(reshape2, ggpubr, corrplot, here)  # 加载必要的R包
-
+# 添加：定义当天日期（格式为YYYYMMDD，如20250807）
+today_date <- format(Sys.Date(), "%Y%m%d")
 
 # 设置输入文件路径
 inputFile = here("3_outputs/CIBERSORT-Results.txt")  # 输入的免疫细胞组成结果文件
@@ -23,7 +24,12 @@ TumorNum = nrow(TumorData)  # 计算治疗组样本数量
 data = t(rbind(conData, TumorData))  # 合并并转置数据，使其适合绘制堆积条形图
 
 # 绘制堆积条形图
-pdf(file = here("3_outputs/免疫细胞浸润barplot.pdf"), width = 13, height = 7.5)  # 保存为PDF
+# 原代码：
+# pdf(file = here("3_outputs/免疫细胞浸润barplot.pdf"), width = 13, height = 7.5)
+
+# 修改后：
+pdf(file = here("3_outputs", paste0(today_date, "_免疫细胞浸润barplot.pdf")), width = 13, height = 7.5)
+
 col = rainbow(nrow(data), s = 0.7, v = 0.7)  # 为每个免疫细胞类型生成颜色
 par(las = 1, mar = c(8, 5, 4, 16), mgp = c(3, 0.1, 0), cex.axis = 1.5)  # 设置绘图参数
 a1 = barplot(data, col = col, xaxt = "n", yaxt = "n", ylab = "Relative Percent", cex.lab = 1.5)  # 绘制条形图
@@ -62,7 +68,10 @@ boxplot = ggboxplot(data, x = "Immune", y = "Expression", color = "Type",
                      symnum.args = list(cutpoints = c(0, 0.001, 0.01, 0.05, 1), symbols = c("***", "**", "*", "")),
                      label = "p.signif")
 
-# 保存箱线图
-pdf(file = here("3_outputs/免疫细胞浸润immune.diff2.pdf"), width = 8, height = 6)
+# 原代码：
+# pdf(file = here("3_outputs/免疫细胞浸润immune.diff2.pdf"), width = 8, height = 6)
+
+# 修改后：
+pdf(file = here("3_outputs", paste0(today_date, "_免疫细胞浸润immune.diff2.pdf")), width = 8, height = 6)
 print(boxplot)  # 打印并保存图形
 dev.off()  # 关闭PDF输出

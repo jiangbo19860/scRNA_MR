@@ -1,12 +1,18 @@
 # 目标变量是Type(Control or Tumor)? 4种模型：随机森林、SVM、XGBoost、GLM均是用于二分类任务
-# 安装必要的包（如果尚未安装）
-#install.packages("caret")
-#install.packages("DALEX")
-#install.packages("ggplot2")
-#install.packages("randomForest")
-#install.packages("kernlab")
-#install.packages("pROC")
-#install.packages("xgboost")
+# 基于基因表达数据和显著基因列表，构建并评估多种机器学习模型，以实现样本组别的分类（如疾病 vs 对照），同时分析关键基因的重要性。代码主要分为数据预处理、模型训练、模型评估和结果输出四个环节。
+# 2个输入文件：合并的标准化基因表达数据1_data/pancreatic_GEO/merged_GSE119794_GSE171485.txt和显著意义的基因列表（3_outputs/汇总有显著意义的MR结果/gene.txt - geneRT）。
+# 三、输出文件
+# 评估图表
+# ML_residual.pdf：模型残差的累积分布图，反映不同模型的预测误差分布。
+# ML_boxplot.pdf：模型残差的箱线图，直观比较不同模型的误差离散程度。
+# ML_ROC.pdf：ROC 曲线及 AUC 值，比较 4 种模型的分类性能（曲线越靠近左上角，AUC 越大，性能越好）。
+# ML_importance.pdf：特征重要性图，展示各模型中对分类贡献最大的基因及其重要性分值。
+# 重要基因列表
+# importanceGene.RF.txt：随机森林模型中前 5 个最重要的基因。
+# importanceGene.SVM.txt：支持向量机模型中前 5 个最重要的基因。
+# importanceGene.XGB.txt：XGBoost 模型中前 5 个最重要的基因。
+# importanceGene.GLM.txt：广义线性模型中前 5 个最重要的基因。
+
 rm(list = ls())  # 清理工作环境
 pacman::p_load(
   caret,      # 用于机器学习的训练控制和数据分割
@@ -24,7 +30,7 @@ set.seed(123)
 
 # 设置输入文件路径
 inputFile = here("1_data/pancreatic_GEO/merged_GSE119794_GSE171485.txt")  # 标准化的合并数据
-geneFile = here("3_outputs/汇总有显著意义的MR结果/gene.txt")  # 基因列表文件
+geneFile = here("3_outputs/20250804_sig_genes_44.txt")  # 基因列表文件
 
 # 读取基因表达数据文件（行：基因，列：样本）
 data = read.table(inputFile, header = TRUE, sep = "\t", check.names = FALSE, row.names = 1)

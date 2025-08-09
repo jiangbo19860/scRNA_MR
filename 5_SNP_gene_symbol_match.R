@@ -144,7 +144,6 @@ output_basename <- paste0(today_date, "_snps_", total, "_genes_matched_", matche
 output_csv <- file.path(output_dir, paste0(output_basename, ".csv"))
 output_txt <- file.path(output_dir, paste0(output_basename, ".txt"))
 
-
 # 9. 保存结果
 write.csv(result_df, output_csv, row.names = FALSE, quote = FALSE)
 write.table(result_df, output_txt, row.names = FALSE, sep = "\t", quote = FALSE)
@@ -212,36 +211,6 @@ filtered_result <- result_df %>%
     nchar(trimws(gene_symbol)) > 0  # 排除仅含空格的情况
   )
 
-# 去重前的所有基因名（含重复）
-all_genes_before_unique <- filtered_result %>% pull(gene_symbol)
-# 每个基因出现的次数
-gene_counts <- table(all_genes_before_unique)
-
-# 筛选出现次数 > 1的重复基因
-duplicated_genes <- gene_counts[gene_counts > 1]
-
-# 输出重复基因的信息
-cat("\n=== 基因名重复情况（导致52→44的原因） ===\n")
-cat("去重前总基因数（含重复）：", length(all_genes_before_unique), "\n")
-cat("去重后唯一基因数：", length(sig_genes), "\n")
-cat("重复基因总数：", sum(duplicated_genes) - length(duplicated_genes), "\n")  # 总重复次数 = 总和 - 基因个数
-cat("重复基因明细（基因名：出现次数）：\n")
-print(duplicated_genes)
-
-# 2. 统计每个基因出现的次数
-gene_counts <- table(all_genes_before_unique)
-
-# 3. 筛选出现次数 > 1的重复基因
-duplicated_genes <- gene_counts[gene_counts > 1]
-
-# 4. 输出重复基因的信息
-cat("\n=== 基因名重复情况（导致52→44的原因） ===\n")
-cat("去重前总基因数（含重复）：", length(all_genes_before_unique), "\n")
-cat("去重后唯一基因数：", length(sig_genes), "\n")
-cat("重复基因总数：", sum(duplicated_genes) - length(duplicated_genes), "\n")  # 总重复次数 = 总和 - 基因个数
-cat("重复基因明细（基因名：出现次数）：\n")
-print(duplicated_genes)
-
 # 14. 保存筛选后的结果为新的CSV和TXT文件
 filtered_output_basename <- paste0(today_date, "_snp_gene_valid_matched_", nrow(filtered_result))
 filtered_output_csv <- file.path(output_dir, paste0(filtered_output_basename, ".csv"))
@@ -278,3 +247,17 @@ if (nrow(filtered_result) > 0) {
   cat("\n未找到有效的gene_symbol，无法生成基因文件\n")
 }
 
+# 去重前的所有基因名（含重复）
+all_genes_before_unique <- filtered_result %>% pull(gene_symbol)
+# 每个基因出现的次数
+gene_counts <- table(all_genes_before_unique)
+
+# 筛选出现次数 > 1的重复基因
+duplicated_genes <- gene_counts[gene_counts > 1]
+
+cat("\n=== 基因名重复情况（导致52→44的原因） ===\n")
+cat("去重前总基因数（含重复）：", length(all_genes_before_unique), "\n")
+cat("去重后唯一基因数：", length(sig_genes), "\n")
+cat("重复基因总数：", sum(duplicated_genes) - length(duplicated_genes), "\n")  # 总重复次数 = 总和 - 基因个数
+cat("重复基因明细（基因名：出现次数）：\n")
+print(duplicated_genes)
