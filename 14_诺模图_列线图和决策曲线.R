@@ -10,8 +10,8 @@ library(rms)  # 用于回归模型和Nomogram的包
 library(rmda) # 用于决策曲线分析 (DCA) 的包
 
 # 设置输入文件路径
-inputFile = "merge.normalize.txt"  # 标准化数据文件
-geneFile = "importanceGene.RF.txt"  # 重要基因文件
+inputFile = "/Users/lijiangbo/scRNA_MR/4_references/Stroke_MR+机器学习/32列线图及校准曲线/merge.normalize.txt"  # 标准化数据文件
+geneFile = "/Users/lijiangbo/scRNA_MR/4_references/Stroke_MR+机器学习/32列线图及校准曲线/importanceGene.RF.txt"  # 重要基因文件
 
 
 # 读取标准化数据文件
