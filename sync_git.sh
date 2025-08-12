@@ -1,19 +1,22 @@
 #!/bin/bash
-# 切换到 R 脚本所在目录
-cd /Users/lijiangbo/scRNA_MR/2_src || {
-  echo "[$(date)] 错误：无法进入目录" >> /Users/lijiangbo/scRNA_MR/sync_error.log
-  exit 1
-}
 
-# 执行 Git 操作
-echo "[$(date)] 开始同步..." >> /Users/lijiangbo/scRNA_MR/sync_git.log
+# 进入项目目录（确保脚本在正确路径执行）
+cd /Users/lijiangbo/scRNA_MR/2_src || { echo "目录不存在"; exit 1; }
 
-# 添加所有 R 脚本
-git add ./*.R
+# 拉取远程最新代码（避免冲突）
+git pull origin main
 
-# 提交（仅当有修改时）
-git diff --quiet --exit-code || {
-  git commit -m "自动同步 R 脚本：$(date +%Y-%m-%d)"
-  git push origin main  # 替换 main 为你的分支名（如 master）
-  echo "[$(date)] 同步成功" >> /Users/lijiangbo/scRNA_MR/sync_git.log
-}
+# 暂存所有已跟踪的.R文件（包括修改和删除）
+git add -u *.R
+
+# 检查是否有可提交的变化
+if git diff --cached --quiet; then
+  echo "No changes to commit"
+  exit 0
+fi
+
+# 提交更改（用日期作为提交信息）
+git commit -m "Auto-sync .R scripts: $(date +'%Y-%m-%d %H:%M:%S')"
+
+# 推送到远程仓库
+git push origin main
