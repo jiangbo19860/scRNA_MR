@@ -347,10 +347,6 @@ lapply(names(imp_summary_list), function(model_name) {
   }
 })
 
-# 绘制特征重要性图（ML_importance）
-cat("绘制特征重要性图...\n")
-pdf(file = out_paths$importance, width = 12, height = 10)
-
 # 为每个模型绘制Top10重要特征条形图
 plots <- lapply(names(imp_summary_list), function(model_name) {
   imp_df <- imp_summary_list[[model_name]]
@@ -362,24 +358,34 @@ plots <- lapply(names(imp_summary_list), function(model_name) {
 
   # 绘制条形图
   ggplot(top10, aes(x = variable, y = mean_dropout_loss)) +
-    geom_bar(stat = "identity", fill = ifelse(model_name == "RF", "#FF6B6B",
-                                              ifelse(model_name == "SVM", "#4ECDC4",
-                                                     ifelse(model_name == "XGB", "#45B7D1", "#FFA07A")))) +
+    geom_bar(stat = "identity",
+             width = 0.6,  # 减小柱子宽度
+             fill = ifelse(model_name == "RF", "#FF6B6B",
+                           ifelse(model_name == "SVM", "#4ECDC4",
+                                  ifelse(model_name == "XGB", "#45B7D1", "#FFA07A")))) +
     coord_flip() +
-    labs(title = paste(model_name),
+    labs(title = model_name,  # 使用lab()而非labs()避免潜在冲突
          x = "", y = "Mean dropout loss") +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5))
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 12),
+      axis.title.x = element_text(size = 14),
+      # 修正margin参数，使用正确的格式
+      plot.margin = unit(c(15, 15, 15, 15), "pt")  # 上、右、下、左
+    )
 })
 
-# 组合图形（过滤空图）
+# 修复核心：打开PDF设备并正确保存图形
+pdf(file = out_paths$importance, width = 12, height = 10)  # 增加宽度以避免标签截断
 plots <- plots[!sapply(plots, is.null)]
 if (length(plots) > 0) {
-  grid.arrange(grobs = plots, ncol = 2)  # 2列布局
+  print(grid.arrange(grobs = plots, ncol = 2))  # 必须使用print()函数
 }
-dev.off()
-cat("特征重要性图（ML_importance）已保存至：", out_paths$importance, "\n")
+dev.off()  # 关闭PDF设备
 
+cat("特征重要性图（ML_importance）已保存至：", out_paths$importance, "\n")
 
 ### 10. 筛选稳定基因 ###
 read_importance <- function(file_path, model_name) {
