@@ -4,7 +4,7 @@
 ## 输出snpExp.txt，在3_outputs文件夹下。
 
 rm(list = ls())  # 清空工作空间
-pacman::p_load(here, data.table, limma, tibble)  # 加载必要的包
+pacman::p_load(here, data.table, limma, tibble, dplyr)  # 加载必要的包
 
 expFile <- here("1_data/GEO/GSE183795/GSE183795_normalized_matrix_final.txt")
 geneFile <- here("3_outputs/20250804_sig_genes_44.txt")
@@ -22,6 +22,12 @@ rt <- read.delim(
 # 查看前2行和前3列（如果文件列数较少，会自动显示实际存在的列）
 print(head(rt[, 1:min(3, ncol(rt))], 2)) # min(3, ncol(rt))：取 “3” 和 “总列数” 中的较小值。rt[, 1:min(3, ncol(rt))]：提取rt中所有行、且列数范围为 “第 1 列到上一步得到的列数” 的数据（即最多前 3 列）。head(..., 2)：从上述提取的子数据框中，再提取前 2 行（只看前 2 行数据）。head()函数的作用是提取数据的前 n 行，其语法为head(x, n)，其中：x是要提取数据的对象（如数据框、矩阵、向量等）；n是一个整数，表示要提取的行数（默认值为 6，即默认提取前 6 行）。
 colnames(rt)
+# 将行名转换为第一列，列名为"gene_name"
+rt <- rt %>%
+  rownames_to_column(var = "gene_name")
+
+# 验证结果：查看转换后的前2行和前4列（含新的gene_name列）
+print(head(rt[, 1:min(4, ncol(rt))], 2))
 
 # 读取基因列表txt文件
 gene_list <- read.delim(geneFile, header = FALSE, sep = "\t", check.names = FALSE, stringsAsFactors = FALSE)
@@ -30,9 +36,7 @@ head(gene_list)
 target_genes <- as.vector(gene_list[, 1])  # 从数据框gene_list中提取所有行和第 1 列的数据
 
 # 3. 数据预处理
-# 3.1 从gene_assignment列提取基因名
-head(rt$gene_name)  # 确认提取结果：应显示"A1BG", "A1CF", ...
-
+head(rt$gene_name)
 # 3.2 提取表达量列（第4列及以后）并转换为矩阵
 exp_columns <- 2:ncol(rt)
 rt_matrix <- as.matrix(rt[, exp_columns, drop = FALSE])
